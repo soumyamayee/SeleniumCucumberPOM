@@ -1,5 +1,7 @@
 package stepDefinitions;
 
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
@@ -11,40 +13,55 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
+import Utilities.ScreenShots;
+import pages.BasePage;
 import pages.HomePage;
 import pages.ProductPage;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 public class ProductSearchSteps {
 	
+
 	WebDriver driver;
     HomePage homePage;
     ProductPage productSearchPage;
-
-	@Given("user on the Amazon UK homepage")
-	public void user_on_the_amazon_uk_homepage() {
-		
-		WebDriverManager.chromedriver().setup();
+    
+    @Before
+    public void setUp() {
+    	WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        driver.get("https://www.amazon.co.uk");
         driver.manage().window().maximize();
+    }  
+    
+	@Given("user on the Amazon UK homepage")
+	public void user_on_the_amazon_uk_homepage() {	
+		
+//		basePage.setup();
+        driver.get("https://www.amazon.co.uk");		
         homePage=new HomePage(driver);
+        //homePage.launUrl();
         homePage.clickAcceptCookies();
+        
 	}
 
 	@When("user navigate to the {string} category")
 	public void user_navigate_to_the_category(String category) throws InterruptedException {
 		 homePage.clickAllMenu();
 	     homePage.navigateToElectronicsAndComputers();
-	    
+	     Assert.assertTrue(driver.getTitle().contains("Electronics"), "Failed to navigate to Electronics category");
 	}
 
 	@When("user select {string}")
 	public void user_select(String subCategory) {
 		if (subCategory.equals("Phones and Accessories")) {
             homePage.navigateToPhonesAndAccessories();
+            Assert.assertTrue(driver.getTitle().contains("Phones & Accessories"), "Failed to navigate to Phones & Accessories");
         } else if (subCategory.equals("Electronics & Photo")) {
         	productSearchPage.selectProductCatagory();
+        	 Assert.assertTrue(driver.getTitle().contains("Electronics & Photo"), "Failed to select Electronics & Photo category");
         }
 	    
 	}
@@ -60,8 +77,10 @@ public class ProductSearchSteps {
 	public void user_apply_the_filter(String filter) {
 		if (filter.equals("Camera Resolution 20 MP and above")) {
             productSearchPage.applyCameraFilter();
+            Assert.assertTrue(driver.getCurrentUrl().contains("20 MP"), "Failed to apply Camera Resolution filter");
         } else if (filter.equals("Model Year 2023")) {
             productSearchPage.applyModelYearFilter();
+            Assert.assertTrue(driver.getCurrentUrl().contains("2023"), "Failed to apply Model Year filter");
         }
 	    
 	}
@@ -75,17 +94,27 @@ public class ProductSearchSteps {
 
 	@Then("user should see a list of Samsung phones that match the specifications")
 	public void user_should_see_a_list_of_samsung_phones_that_match_the_specifications() {
-		 System.out.println("Matching Samsung phones are displayed.");
+		WebElement results = driver.findElement(By.cssSelector("div.s-main-slot"));
+		Assert.assertTrue(results.getText().contains("Samsung"), "No Samsung phones found matching the specifications");
+		System.out.println("Matching Samsung phones are displayed.");
 	     //driver.quit();
 	    
 	}
+	@After
+    public void tearDown(io.cucumber.java.Scenario scenario) {
+        if (scenario.isFailed()) {
+            // Capture screenshot on failure
+        	ScreenShots.takeScreenshot(driver,scenario.getName());
+        }
+        if (driver != null) {
+            driver.quit();
+        }
+    }
 
 	@Then("user should see a message indicating {string}")
 	public void user_should_see_a_message_indicating(String message) {
 		// Verification logic for no results found
         System.out.println(message);
-        driver.quit();
-	    
 	}
 
 	@Given("user have searched for Samsung phones with Camera Resolution {int} MP and above, Model Year {int}, Price Range £{int} {double} £{int}")

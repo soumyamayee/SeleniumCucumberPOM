@@ -32,7 +32,7 @@ public class HomePage extends BasePage{
     public HomePage(WebDriver driver) {
         super(driver);        
     }
-
+    
     public void clickAllMenu() {
         allMenu.click();
     }
@@ -44,7 +44,7 @@ public class HomePage extends BasePage{
 		 * 
 		 * electronicsComputersCategory.click();
 		 */
-        By locator = By.xpath("//div[text()= 'Electronics & Computers'][1]");
+        By locator = By.xpath("//div[text()= 'lectronics & Computers'][1]");
         scrollToElement(locator);
         //WebElement electronicsComputersCategory = driver.findElement(locator);
         
