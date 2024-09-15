@@ -6,11 +6,11 @@ Feature: Amazon Product Search and Filtering
     Given user on the Amazon UK homepage
     When user navigate to the "Electronics and Computers" category
     And user select "Phones and Accessories"
-    And user select "Mobile Phones"
     And user search for "Samsung phones"
+    And user select "Electronics & Photo"
     And user apply the filter "Camera Resolution 20 MP and above"
     And user apply the filter "Model Year 2023"
-    And user apply the price range filter "£50 - £100"
+    And user apply the price range filter "£120 - £150"
     Then user should see a list of Samsung phones that match the specifications
 #
   #Scenario: No Samsung phones found with the specified filters

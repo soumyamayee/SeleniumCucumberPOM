@@ -13,14 +13,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class HomePage {
+public class HomePage extends BasePage{
 	
-	 WebDriver driver;    
-     Actions actions;
-     WebDriverWait wait;
-     long defaultTimeout = 10;
-    
-     
     @FindBy(id = "nav-hamburger-menu") 
     WebElement allMenu;    
        
@@ -30,15 +24,13 @@ public class HomePage {
     @FindBy(xpath ="//a[text()='Phones & Accessories']")
     WebElement phonesAccessoriesCategory;
 
-    @FindBy(xpath = "//div[text()='Mobile Phones']")
-    WebElement mobilePhonesCategory;
+	/*
+	 * @FindBy(xpath = "//div[text()='Mobile Phones']") WebElement
+	 * mobilePhonesCategory;
+	 */
     
     public HomePage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        this.actions = new Actions(driver);
-        PageFactory.initElements(driver, this);
-        
+        super(driver);        
     }
 
     public void clickAllMenu() {
@@ -82,9 +74,9 @@ public class HomePage {
         
     }
 
-    public void navigateToMobilePhones() {
-        mobilePhonesCategory.click();
-    }
+	/*
+	 * public void navigateToMobilePhones() { mobilePhonesCategory.click(); }
+	 */
     // Wait for the 'Accept Cookies' button to be clickable
     public void clickAcceptCookies() {
     	WebElement acceptCookiesButton = waitForElementToBeClickable(By.id("sp-cc-accept"), defaultTimeout);
@@ -123,12 +115,7 @@ public class HomePage {
         return waitForCondition(locator, ExpectedConditions.presenceOfElementLocated(locator), timeout);
     }
  // Generic method to scroll to an element (using Actions)
-    public void scrollToElement1(By locator) {    	
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(defaultTimeout));
-        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        actions=new Actions(driver);
-        actions.moveToElement(element).perform();
-    }
+    
     public void scrollToElement(By locator) {
         WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
