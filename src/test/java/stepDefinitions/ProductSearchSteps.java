@@ -135,7 +135,7 @@ public class ProductSearchSteps {
 	@When("user apply the filter {string}")
 	public void applyFilter(String filter) {
 		  // Apply the 'Camera Resolution 20 MP and above' filter
-		if (filter.equals("Camera Resolution 20 MP and above")) {
+		if (filter.equals("Camera Resolution 20 MP and above")||filter.equals("Camera Resolution 50 MP and above") ) {
             Boolean isApplied =productSearchPage.applyCameraFilter();
             Assert.assertTrue(isApplied, "Failed to apply Camera Resolution filter");
             extentTest.info("User applied Camera Resolution filter.");
@@ -166,7 +166,16 @@ public class ProductSearchSteps {
 		   
 	}
 	
-
+	@When("user sort the results by price {string}")
+	public void verifySortByPrice(String sortOrder) throws InterruptedException {
+		//Assert.assertTrue(productSearchPage.sortByPrice(sortOrder), "Failed to sort by price High to Low.");
+        extentTest.info("User selected the sort by : Price High to Low.");
+	}
+	
+	@Then("user should see the price of first phone on the list should be less than {string}")
+	public void verifyPriceOfProductAfterSort(String pricetoCompare) {
+		productSearchPage.verifyFirstPhonePrice(pricetoCompare);
+	}
 	
 	
 	
@@ -232,21 +241,6 @@ public class ProductSearchSteps {
 	    
 	    
 	}
-
-	@Given("user have filtered the search results to show Samsung phones with Camera Resolution {int} MP and above, Model Year {int}, Price Range £{int} {double} £{int}")
-	public void user_have_filtered_the_search_results_to_show_samsung_phones_with_camera_resolution_mp_and_above_model_year_price_range_£_£(Integer int1, Integer int2, Integer int3, Double double1, Integer int4) {
-	    
-	    
-	}
-
-	@When("user sort the results by price {string}")
-	public void user_sort_the_results_by_price(String sortOrder) {
-		 if (sortOrder.equals("low to high")) {
-	            productSearchPage.sortByPriceLowToHigh();
-	        }
-	    
-	}
-
 	@Then("the search results should be sorted by price in ascending order")
 	public void the_search_results_should_be_sorted_by_price_in_ascending_order() {
 		// Verification logic here

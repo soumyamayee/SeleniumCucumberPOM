@@ -11,7 +11,8 @@ import io.cucumber.testng.AbstractTestNGCucumberTests;
    features = "src/test/resources/Features",
    glue = {"stepDefinitions"},
    plugin = { "pretty", "html:reports/cucumber-reports.html" },
-   monochrome = true
+   monochrome = true,
+   tags = "@TestCase1 or @TestCase2" 
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
 

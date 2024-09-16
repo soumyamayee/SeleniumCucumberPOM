@@ -41,10 +41,7 @@ public class ProductPage extends BasePage {
 
     @FindBy(xpath = "//span[text()='Sort by:']")
     WebElement sortByDropdown;
-
-    @FindBy(xpath = "//a[text()='Price: Low to High']")
-    WebElement sortByPriceLowToHigh;
-
+    
     @FindBy(xpath = "//span[text()='Samsung']")
     WebElement brandFilter;
     
@@ -66,7 +63,22 @@ public class ProductPage extends BasePage {
     @FindBy(xpath ="//span[@class='a-size-base-plus a-color-base']")
     List<WebElement> productTitles;
   
-     
+    @FindBy(xpath ="//span[@class='a-button-text a-declarative']")
+    WebElement sortByButton;
+    
+    @FindBy(xpath ="//div[@aria-hidden='false']//a[text()='Price: High to low']")
+    WebElement optionHighToLowPrice;
+  
+    @FindBy(xpath ="//div[contains(@class,'template=SEARCH_RESULTS')]//span[@class='a-offscreen']")
+    List<WebElement> productList;
+    
+    @FindBy(xpath ="(//div[contains(@class,'template=SEARCH_RESULTS')]//span[@class='a-offscreen'])[1]")
+    WebElement firstProduct;
+    
+    @FindBy(xpath =" //span[@class='a-dropdown-label']//following-sibling::span")
+    WebElement SelectedSortByOption;
+ 
+    
     /**
      * Constructor to initialize the WebDriver from super class
      */
@@ -365,9 +377,60 @@ public class ProductPage extends BasePage {
         inStockFilter.click();
     }
 
-    public void sortByPriceLowToHigh() {
-        sortByDropdown.click();
-        sortByPriceLowToHigh.click();
+    public boolean sortByPrice(String sortOption) throws InterruptedException {
+    	waitForElementToBeClickable(sortByDropdown,defaultTimeout).click();
+        //sortByDropdown.click();
+        if(sortOption.equalsIgnoreCase("high to low")) {
+        	//Thread.sleep(500);
+        	//waitForElementToBeClickable(optionHighToLowPrice,defaultTimeout).click();
+        	clickElementWithJS(optionHighToLowPrice);
+        	//Thread.sleep(500);
+        	}else {
+        	//sortByPriceLowToHigh.click();
+        }
+        waitForElementToBeClickable(SelectedSortByOption,defaultTimeout);
+        String textOptionSelected=SelectedSortByOption.getText();
+        System.out.println("sort product value : " + textOptionSelected);
+       if(textOptionSelected.contains(sortOption)) {
+    	   return true;
+       }else {
+       return false;}
+    }
+    
+    public boolean verifyFirstPhonePrice(String price) {
+    	//get price of first phone
+    	price = price.replaceAll("[^0-9]", "");
+    	int expectedPrice= Integer.parseInt(price);
+    	System.out.println("expected price is : " + expectedPrice);
+    	//scrollToEleWithJS(firstProduct);
+    	//verify the filter selected
+    	try {    		 
+   		   waitForElementToBevisible(SelectedSortByOption,defaultTimeout);
+   	    }catch (Exception e){
+   		   scrollToEleWithJS(SelectedSortByOption);
+   		   highlightElement(SelectedSortByOption);
+   	    }
+    	try {    		 
+    		   waitForElementToBevisible(firstProduct,defaultTimeout);
+	    }catch (Exception e){
+		   scrollToEleWithJS(firstProduct);
+		   highlightElement(firstProduct);
+	    }
+    	 JavascriptExecutor js = (JavascriptExecutor) driver;
+         String text = (String) js.executeScript("return arguments[0].innerText;", firstProduct);
+         text= text.replace("£", "").replace(",", "");
+         float priceFloat = Float.parseFloat(text);
+         int highPriceProduct = (int) priceFloat;
+    	System.out.println("First product price is : " + text);    	
+    	System.out.println("highPriceProduct is : " + highPriceProduct);
+    	if(highPriceProduct < expectedPrice)
+    	{
+    		return true;
+    	}
+    	else
+    	{
+    		return false;
+    	}
     }
 
     public void applyBrandFilter() {
@@ -377,7 +440,8 @@ public class ProductPage extends BasePage {
     public void selectProductCatagory() {
     	electronicsAndPhotoCategory.click();
     }
-
+    
+   
 	
     //working with step increment = 1
 //  public void setSliderToTargetValue(int targetVal) throws InterruptedException { 
