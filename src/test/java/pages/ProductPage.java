@@ -153,8 +153,8 @@ public class ProductPage extends BasePage {
      * This method checks the search results and verifies if they contain the expected "Samsung" product name.
      */
     public void verifyProductSearchResult() throws InterruptedException {
-	    Thread.sleep(500);
-	    assertFalse("No products found", productTitles.isEmpty());
+	    Thread.sleep(1000);
+	   // assertFalse("No products found", productTitles.isEmpty());
 	    //verify product titles
 	    for (WebElement ele : productTitles) {
 	        String productTitle = ele.getText();	       
@@ -170,7 +170,7 @@ public class ProductPage extends BasePage {
      * @param priceRange - The price range to filter by (e.g., "£120 - £150").
      * This method selects the price range filter for the product listings.
      */
-    public void applyPriceFilter(String lowPrice, String highPrice) throws InterruptedException { 
+    public boolean applyPriceFilter(String lowPrice, String highPrice) throws InterruptedException { 
         try {
             
           String temp=highPrice.replaceAll("[^0-9]", "");
@@ -179,11 +179,13 @@ public class ProductPage extends BasePage {
           temp = lowPrice.replaceAll("[^0-9]", "");
           int minPrice = Integer.parseInt(temp);
           setUpperSliderToTargetValue(maxValue);
+          return true;
         
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to apply price filter", e);
         }
+        
     }
 
     

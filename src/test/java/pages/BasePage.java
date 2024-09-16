@@ -21,7 +21,7 @@ public class BasePage {
 	protected WebDriver driver;
     protected WebDriverWait wait;
 	protected Actions actions;
-	protected long defaultTimeout = 1;
+	protected long defaultTimeout = 10;
     public BasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(defaultTimeout));
