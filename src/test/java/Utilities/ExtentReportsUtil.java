@@ -9,7 +9,7 @@ public class ExtentReportsUtil {
 	public static void extentTest() {
 		
 		 ExtentReports extent;		
-		 ExtentSparkReporter spark = new ExtentSparkReporter("C:/Users/UNIVERSAL MOBILES/SeeleniumCucumberProj/CucumberJava/reports/ExtentReport.html");
+		 ExtentSparkReporter spark = new ExtentSparkReporter(System.getProperty("user.dir") +"/reports/ExtentReport.html");
 	     spark.config().setReportName("Automation Test Results");
 	     spark.config().setDocumentTitle("Test Report");	
 	     // Create ExtentReports object
