@@ -20,8 +20,9 @@ public class ScreenShots extends BasePage {
 
 	public static String takeScreenshot(WebDriver driver, String screenshotName) {
         String timestamp = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
-        File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        String destination = "C:/Users/UNIVERSAL MOBILES/SeeleniumCucumberProj/CucumberJava/screenshots/" + screenshotName + timestamp + ".png";
+        File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);		
+        String projectPath=System.getProperty("user.dir")+ "/SeleniumCucumberPOM/screenshots";
+        String destination = projectPath + screenshotName + timestamp + ".png";
         try {
             FileUtils.copyFile(srcFile, new File(destination));
             System.out.println("Screenshot taken: " + destination);
