@@ -12,6 +12,16 @@ Feature: Amazon Product Search and Filtering
     And user apply the filter "Model Year 2023"
     And user apply the price range filter "£120 - £150"
     Then user should see a list of Samsung phones that match the specifications
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 #
   #Scenario: No Samsung phones found with the specified filters
     #Given user on the Amazon UK homepage
