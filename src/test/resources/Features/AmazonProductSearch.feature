@@ -1,17 +1,17 @@
 #Author 
 Feature: Amazon Product Search and Filtering
 
- #@TestCase1
-  #Scenario: List all Samsung phones with Camera Resolution 20 MP and above, Model Year 2023, Price Range £50 - £100
-    #Given user on the Amazon UK homepage
-    #When user navigate to the "Electronics and Computers" category
-    #And user select "Phones and Accessories"
-    #And user search for "Samsung phones"
-    #And user select "Electronics & Photo"
-    #And user apply the filter "Camera Resolution 20 MP and above"
-    #And user apply the filter "Model Year 2023"
-    #And user apply the price range filter "£50 - £150"
-    #Then user should see a list of Samsung phones that match the specifications    
+ @TestCase1
+  Scenario: List all Samsung phones with Camera Resolution 20 MP and above, Model Year 2023, Price Range £50 - £100
+    Given user on the Amazon UK homepage
+    When user navigate to the "Electronics and Computers" category
+    And user select "Phones and Accessories"
+    And user search for "Samsung phones"
+    And user select "Electronics & Photo"
+    And user apply the filter "Camera Resolution 20 MP and above"
+    And user apply the filter "Model Year 2023"
+    And user apply the price range filter "£50 - £150"
+    Then user should see a list of Samsung phones that match the specifications    
  @TestCase2
 	Scenario: Sorting Samsung phones by price after applying filters
 	  Given user on the Amazon UK homepage
@@ -24,7 +24,8 @@ Feature: Amazon Product Search and Filtering
     And user apply the price range filter "£50 - £150"
     When user sort the results by price "High to low"
     Then user should see the price of first phone on the list should be less than "£150"
-    
+    #
+    #working in progress
   #Scenario: Filter Samsung phones by availability (in-stock items only)
     #Given user have applied filters for Camera Resolution 20 MP and above, Model Year 2023, Price Range £50 - £100
     #Given user filter the results by availability "In Stock"

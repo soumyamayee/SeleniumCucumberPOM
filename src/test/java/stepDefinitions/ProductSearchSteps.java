@@ -72,11 +72,11 @@ public class ProductSearchSteps {
             extentTest.pass("Test passed: " + scenario.getName());
         }
 
-        // Ensure driver quits at the end of the test
-//        if (driver != null) {
-//            driver.quit();
-//            log.info("Browser closed.");
-//        }
+       //  Ensure driver quits at the end of the test
+        if (driver != null) {
+            driver.quit();
+            log.info("Browser closed.");
+        }
 
         // Flush ExtentReports
         extentReports.flush();
@@ -86,12 +86,10 @@ public class ProductSearchSteps {
     
 	@Given("user on the Amazon UK homepage")
 	public void userOnAmazonHomePage() {
-        driver.get("http://www.amazon.co.uk");	
-		//driver.get("https://www.amazon.co.uk/s?k=Samsung+phones&i=electronics&rh=n%3A560798%2Cp_n_feature_four_browse-bin%3A14210450031%2Cp_n_feature_thirteen_browse-bin%3A12421314031&dc=&qid=1726486038&rnid=389035011&ref=sr_nr_p_36_0_0&low-price=&high-price=");
-        Assert.assertTrue(driver.getTitle().contains("Amazon.co.uk"), "The page title did not match!");
+        driver.get("http://www.amazon.co.uk");	        
         homePage=new HomePage(driver);
-        homePage.clickAcceptCookies();
-        Assert.assertTrue(driver.getTitle().contains("Electronics"), "Failed to navigate to Electronics category");         
+        homePage.clickAcceptCookies();  
+        Assert.assertTrue(driver.getTitle().contains("Amazon.co.uk"), "The page title did not match!");
         extentTest.info("Navigated to Amazon UK homepage.");
         log.info("Navigated to Amazon UK homepage."); 
 	}
@@ -151,9 +149,8 @@ public class ProductSearchSteps {
 	@When("user apply the price range filter {string}")
 	public void applyPriceRangeFilter(String priceRange) throws InterruptedException {		
 		 // Apply the price range filter '£120 - £150'
-		String[] prices = priceRange.split(" - ");
-        productSearchPage.applyPriceFilter(prices[0], prices[1]);        
-        //Assert.assertEquals("true", "Price range selected");
+		String[] prices = priceRange.split(" - ");                
+        Assert.assertTrue(productSearchPage.applyPriceFilter(prices[0], prices[1]), "Failed to apply price filter");
         log.info("User Navigated to Electronics & Photo"); 
         extentTest.info("User applied price range filter: " + priceRange);
 	}
