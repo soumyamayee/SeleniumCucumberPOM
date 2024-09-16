@@ -2,6 +2,8 @@ package stepDefinitions;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.BeforeStep;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
@@ -21,6 +23,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+
+import Utilities.ExtentReportsUtil.ExtentReportManager;
 import Utilities.ScreenShots;
 import pages.BasePage;
 import pages.HomePage;
@@ -31,45 +37,72 @@ import org.apache.logging.log4j.Logger;
 
 public class ProductSearchSteps {
 	
-
+	
 	WebDriver driver;
     HomePage homePage;
     ProductPage productSearchPage;
-    private static final Logger logger = LogManager.getLogger(ProductSearchSteps.class);
+    ExtentReports extentReports;
+    ExtentTest extentTest;
+    private static Logger log = LogManager.getLogger(ProductSearchSteps.class);
     SoftAssert softAssert = new SoftAssert();
+    
+ // Consolidate WebDriver and ExtentReports setup
     @Before
-    public void setUp() {
-    	WebDriverManager.chromedriver().setup();
+    public void setUp(Scenario scenario) {
+        // Set up WebDriver
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-    }  
-    @After
-    public void tearDown(io.cucumber.java.Scenario scenario) {
-        if (scenario.isFailed()) {
-            // Capture screenshot on failure
-        	ScreenShots.takeScreenshot(driver,scenario.getName());
-        }		
-		/*
-		 * if (driver != null){ driver.quit(); }
-		 */		 
+        
+        // Initialize ExtentReports and create test for the scenario
+        extentReports = ExtentReportManager.getInstance(); // Assumes ExtentReportManager is correctly configured
+        extentTest = extentReports.createTest(scenario.getName());
+        
+        log.info("Setup complete: WebDriver initialized and ExtentReports test created.");
     }
+
+    @After
+    public void tearDown(Scenario scenario) {
+        // Take a screenshot if the test fails
+        if (scenario.isFailed()) {
+            String screenshotPath = ScreenShots.takeScreenshot(driver, scenario.getName());
+            extentTest.addScreenCaptureFromPath(screenshotPath);
+            extentTest.fail("Test failed: " + scenario.getName());
+        } else {
+            extentTest.pass("Test passed: " + scenario.getName());
+        }
+
+        // Ensure driver quits at the end of the test
+//        if (driver != null) {
+//            driver.quit();
+//            log.info("Browser closed.");
+//        }
+
+        // Flush ExtentReports
+        extentReports.flush();
+        log.info("ExtentReports flushed.");
+    }
+    
     
 	@Given("user on the Amazon UK homepage")
 	public void userOnAmazonHomePage() {
-        driver.get("https://www.amazon.co.uk");	
+        driver.get("http://www.amazon.co.uk");	
+		//driver.get("https://www.amazon.co.uk/s?k=Samsung+phones&i=electronics&rh=n%3A560798%2Cp_n_feature_four_browse-bin%3A14210450031%2Cp_n_feature_thirteen_browse-bin%3A12421314031&dc=&qid=1726486038&rnid=389035011&ref=sr_nr_p_36_0_0&low-price=&high-price=");
         Assert.assertTrue(driver.getTitle().contains("Amazon.co.uk"), "The page title did not match!");
         homePage=new HomePage(driver);
         homePage.clickAcceptCookies();
-        Assert.assertTrue(driver.getTitle().contains("Electronics"), "Failed to navigate to Electronics category");
-        logger.info("Navigated to Amazon UK homepage.");        
+        Assert.assertTrue(driver.getTitle().contains("Electronics"), "Failed to navigate to Electronics category");         
+        extentTest.info("Navigated to Amazon UK homepage.");
+        log.info("Navigated to Amazon UK homepage."); 
 	}
 
 	@When("user navigate to the {string} category")
 	public void navigateToCategory(String category) throws InterruptedException {
 		 homePage.clickAllMenu();
 	     homePage.navigateToElectronicsAndComputers();
-	     Assert.assertTrue(driver.getTitle().contains("Electronics"), "Failed to navigate to Electronics category");
-	     logger.info("User Navigated to Electronics and Computers category."); 
+	     Assert.assertTrue(driver.getTitle().contains("Electronics"), "Failed to navigate to Electronics category");	     
+	     extentTest.info("User navigated to Electronics and Computers category.");
+	     log.info("User Navigated to Electronics and Computers category."); 
 	}
 
 	@When("user select {string}")
@@ -77,11 +110,13 @@ public class ProductSearchSteps {
 		if (subCategory.equals("Phones and Accessories")) {
 			// Select the 'Phones and Accessories' sub-category
             homePage.navigateToPhonesAndAccessories();
-            Assert.assertTrue(driver.getTitle().contains("Phones"), "Failed to navigate to Phones & Accessories");
-            logger.info("User Navigated to Phones and Accessories"); 
+            Assert.assertTrue(driver.getTitle().contains("Phones"), "Failed to navigate to Phones & Accessories");            
+            extentTest.info("User navigated to Phones and Accessories.");
+            log.info("User Navigated to Phones and Accessories"); 
         } else if (subCategory.equals("Electronics & Photo")) {
         	productSearchPage.selectProductCatagory(); 
-        	logger.info("User Navigated to Electronics & Photo"); 
+        	extentTest.info("User Navigated to Electronics & Photo");
+        	log.info("User Navigated to Electronics & Photo"); 
         }
 	    
 	}
@@ -93,6 +128,7 @@ public class ProductSearchSteps {
 		productSearchPage.searchForProduct(product);
 		Thread.sleep(500);
 		productSearchPage.verifyProductSearchResult();
+		extentTest.info("User searched for product: " + product);
 		
 	}
 
@@ -102,27 +138,31 @@ public class ProductSearchSteps {
 		if (filter.equals("Camera Resolution 20 MP and above")) {
             Boolean isApplied =productSearchPage.applyCameraFilter();
             Assert.assertTrue(isApplied, "Failed to apply Camera Resolution filter");
+            extentTest.info("User applied Camera Resolution filter.");
         } else if (filter.equals("Model Year 2023")) {
         	// Apply the 'Model Year 2023' filter
             Boolean isApplied =productSearchPage.applyModelYearFilter();
             Assert.assertTrue(isApplied, "Failed to apply Model year filter");
+            extentTest.info("User applied Model Year filter.");
         }
 	    
 	}
 
 	@When("user apply the price range filter {string}")
-	public void applyPriceRangeFilter(String priceRange) throws InterruptedException {
+	public void applyPriceRangeFilter(String priceRange) throws InterruptedException {		
 		 // Apply the price range filter '£120 - £150'
 		String[] prices = priceRange.split(" - ");
         productSearchPage.applyPriceFilter(prices[0], prices[1]);        
         //Assert.assertEquals("true", "Price range selected");
+        log.info("User Navigated to Electronics & Photo"); 
+        extentTest.info("User applied price range filter: " + priceRange);
 	}
 
 	@Then("user should see a list of Samsung phones that match the specifications")
 	public void verifySamsungPhonesInResults() throws InterruptedException {
-		Thread.sleep(500);
-		Thread.sleep(500);
+		Thread.sleep(200);
 		productSearchPage.verifyProductSearchResult();
+		extentTest.info("User verified Samsung phones in search results.");
 		   
 	}
 	

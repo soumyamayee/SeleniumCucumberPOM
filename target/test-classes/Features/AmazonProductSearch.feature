@@ -10,7 +10,7 @@ Feature: Amazon Product Search and Filtering
     And user select "Electronics & Photo"
     And user apply the filter "Camera Resolution 20 MP and above"
     And user apply the filter "Model Year 2023"
-    And user apply the price range filter "£120 - £150"
+    And user apply the price range filter "£50 - £150"
     Then user should see a list of Samsung phones that match the specifications
     
     

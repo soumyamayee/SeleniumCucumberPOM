@@ -21,10 +21,10 @@ public class BasePage {
 	protected WebDriver driver;
     protected WebDriverWait wait;
 	protected Actions actions;
-	protected long defaultTimeout = 10;
+	protected long defaultTimeout = 1;
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(defaultTimeout));
         this.actions = new Actions(driver);
         PageFactory.initElements(driver, this);
     }

@@ -6,19 +6,26 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
 public class ExtentReportsUtil {
 	
-	public static void extentTest() {
-		
-		 ExtentReports extent;		
-		 ExtentSparkReporter spark = new ExtentSparkReporter(System.getProperty("user.dir") +"/reports/ExtentReport.html");
-	     spark.config().setReportName("Automation Test Results");
-	     spark.config().setDocumentTitle("Test Report");	
-	     // Create ExtentReports object
-	     extent = new ExtentReports();
-	     extent.attachReporter(spark);
-	
-	     // Optional: Add some system/environment information to the report
-	     extent.setSystemInfo("Tester", "Soumyamayee");
-	     extent.setSystemInfo("Environment", "QA");
-	     extent.setSystemInfo("Browser", "Chrome");
-	}
+
+public static class ExtentReportManager {
+    private static ExtentReports extentReports;
+    private static ExtentSparkReporter sparkReporter;
+
+    public static  ExtentReports getInstance() {
+        if (extentReports == null) {
+            extentReports = new ExtentReports();
+            sparkReporter = new ExtentSparkReporter(System.getProperty("user.dir") +"/reports/ExtentReport.html");
+            extentReports.attachReporter(sparkReporter);
+            extentReports.setSystemInfo("OS", System.getProperty("os.name"));
+            extentReports.setSystemInfo("Browser", "Chrome");
+        }
+        return extentReports;
+    }
+
+    public static void closeReport() {
+        if (extentReports != null) {
+            extentReports.flush();
+        }
+    }
+}
 }
