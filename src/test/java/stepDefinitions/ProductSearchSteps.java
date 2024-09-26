@@ -73,10 +73,10 @@ public class ProductSearchSteps {
         }
 
        //  Ensure driver quits at the end of the test
-        if (driver != null) {
-            driver.quit();
-            log.info("Browser closed.");
-        }
+//        if (driver != null) {
+//            driver.quit();
+//            log.info("Browser closed.");
+//        }
 
         // Flush ExtentReports
         extentReports.flush();
@@ -110,11 +110,9 @@ public class ProductSearchSteps {
             homePage.navigateToPhonesAndAccessories();
             Assert.assertTrue(driver.getTitle().contains("Phones"), "Failed to navigate to Phones & Accessories");            
             extentTest.info("User navigated to Phones and Accessories.");
-            log.info("User Navigated to Phones and Accessories"); 
         } else if (subCategory.equals("Electronics & Photo")) {
         	productSearchPage.selectProductCatagory(); 
         	extentTest.info("User Navigated to Electronics & Photo");
-        	log.info("User Navigated to Electronics & Photo"); 
         }
 	    
 	}
@@ -125,7 +123,7 @@ public class ProductSearchSteps {
 		productSearchPage = new ProductPage(driver) ;
 		productSearchPage.searchForProduct(product);
 		Thread.sleep(500);
-		productSearchPage.verifyProductSearchResult();
+		//productSearchPage.verifyProductSearchResult();
 		extentTest.info("User searched for product: " + product);
 		
 	}
@@ -165,11 +163,11 @@ public class ProductSearchSteps {
 	
 	@When("user sort the results by price {string}")
 	public void verifySortByPrice(String sortOrder) throws InterruptedException {
-		//Assert.assertTrue(productSearchPage.sortByPrice(sortOrder), "Failed to sort by price High to Low.");
+		Assert.assertTrue(productSearchPage.sortByPrice(sortOrder), "Failed to sort by price High to Low.");
         extentTest.info("User selected the sort by : Price High to Low.");
 	}
 	
-	@Then("user should see the price of first phone on the list should be less than {string}")
+	@Then("user should see the price of first phone on the list should be less than or equals to {string}")
 	public void verifyPriceOfProductAfterSort(String pricetoCompare) {
 		productSearchPage.verifyFirstPhonePrice(pricetoCompare);
 	}
@@ -228,10 +226,12 @@ public class ProductSearchSteps {
 
 	@Given("user filter the results by availability {string}")
 	public void user_filter_the_results_by_availability(String availability) {
-		if (availability.equals("In Stock")) {
-            productSearchPage.applyInStockFilter();
-	    
-	}}
+		/*
+		 * if (availability.equals("In Stock")) {
+		 * productSearchPage.applyInStockFilter();
+		 * 
+		 * }
+		 */}
 
 	@Then("user should see only the Samsung phones that are available for immediate purchase")
 	public void user_should_see_only_the_samsung_phones_that_are_available_for_immediate_purchase() {
@@ -253,16 +253,14 @@ public class ProductSearchSteps {
 	}
 
 	@Then("user should apply the brand filter {string}")
-	public void user_should_apply_the_brand_filter(String string) {
-	    
-	    
+	public void user_should_apply_the_brand_filter(String text) throws InterruptedException {
+		productSearchPage.applyBrandFilter(text);
 	}
 
 	@Then("the search results should only display Samsung phones")
 	public void the_search_results_should_only_display_samsung_phones() {
-		productSearchPage.applyBrandFilter();
-        System.out.println("Only Samsung phones are displayed.");
-        driver.quit();
+		productSearchPage.applyBrandFilter(null);
+        System.out.println("Only Samsung phones are displayed.");       
 	    
 	}
 

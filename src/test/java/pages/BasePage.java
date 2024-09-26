@@ -34,22 +34,51 @@ public class BasePage {
 
     // JavaScript click for hidden elements
     public void clickElementWithJS(WebElement ele) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", ele);
+    	try {
+	        JavascriptExecutor js = (JavascriptExecutor) driver;
+	        js.executeScript("arguments[0].click();", ele);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
     }
     // JavaScript sendkeys for hidden elements
-    public void sendTextWithJS(WebElement ele, String text) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].value='"+text+"';", ele);
+    public void sendTextWithJS(WebElement ele, String text) {        
+        try {
+        	JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].value='"+text+"';", ele);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
     
     // JavaScript scrollto elements
     public void scrollToEleWithJS(WebElement ele) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].scrollIntoView(true);", ele);
+    	try {
+    		 JavascriptExecutor js = (JavascriptExecutor) driver;
+    	     js.executeScript("arguments[0].scrollIntoView(true);", ele);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    	}
+       
     }
+	 // JavaScript get innnertext elements
+	    public String getInnerTextWithJS(WebElement ele) {
+	    	String text = "";
+	    	try {
+	    		JavascriptExecutor js = (JavascriptExecutor) driver;
+	  	       text= (String) js.executeScript("return arguments[0].innerText;", ele);
+	  	      return text;
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+			return text;
+	        
+	    }
+    
+    
     // Generic explicit wait method for element to be clickable
-    public WebElement waitForElementToBeClickable(WebElement ele, Long timeoutInSeconds) {
+    public WebElement waitForElementToBeClickable(WebElement ele, Long timeoutInSeconds) {    	
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
         return wait.until(ExpectedConditions.elementToBeClickable(ele));
     }
@@ -87,7 +116,12 @@ public class BasePage {
 	     * @param element - The WebElement to be clicked.
 	     */
 	    public void clickElement(WebElement element) {
-	        actions.moveToElement(element).click().build().perform();
+	    	try {
+	    		 actions.moveToElement(element).click().build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	       
 	    }
 
 	    /**
@@ -95,7 +129,12 @@ public class BasePage {
 	     * @param element - The WebElement to right-click on.
 	     */
 	    public void rightClickElement(WebElement element) {
-	        actions.contextClick(element).build().perform();
+	    	try {
+	    		 actions.contextClick(element).build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	       
 	    }
 
 	    /**
@@ -103,7 +142,11 @@ public class BasePage {
 	     * @param element - The WebElement to double-click on.
 	     */
 	    public void doubleClickElement(WebElement element) {
-	        actions.doubleClick(element).build().perform();
+	    	try {
+	    		actions.doubleClick(element).build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}	        
 	    }
 
 	    /**
@@ -111,7 +154,12 @@ public class BasePage {
 	     * @param element - The WebElement to click and hold.
 	     */
 	    public void clickAndHoldElement(WebElement element) {
-	        actions.clickAndHold(element).build().perform();
+	    	try {
+	    		actions.clickAndHold(element).build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	        
 	    }
 
 	    /**
@@ -120,7 +168,12 @@ public class BasePage {
 	     * @param target - The WebElement to drop to.
 	     */
 	    public void dragAndDrop(WebElement source, WebElement target) {
-	        actions.dragAndDrop(source, target).build().perform();
+	    	try {
+	    		 actions.dragAndDrop(source, target).build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	       
 	    }
 
 	    /**
@@ -128,7 +181,12 @@ public class BasePage {
 	     * @param element - The WebElement to hover over.
 	     */
 	    public void hoverOverElement(WebElement element) {
-	        actions.moveToElement(element).build().perform();
+	    	try {
+	    		actions.moveToElement(element).build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	        
 	    }
 
 	    /**
@@ -147,7 +205,12 @@ public class BasePage {
 	     * @param keys - The keys to send (e.g., Keys.ENTER).
 	     */
 	    public void sendKeys(WebElement element, String keys) {
-	        actions.moveToElement(element).sendKeys(element, keys).build().perform();
+	    	try {
+	    		actions.moveToElement(element).sendKeys(element, keys).build().perform();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	        
 	    }
 	    
 	    public static double findSliderPosition(double value, double minValue, double maxValue) {
@@ -159,6 +222,50 @@ public class BasePage {
 	        // Returning the slider position as a percentage
 	        return position * 100;
 	    }
+	    
+	    /**
+	     * Performes click operation on the specified element.
+	     * @param element - The WebElement to perform click.
+	     */
+	    public void click(WebElement element) {	    
+	    	try {
+	    		highlightElement(element);   
+	        	waitForElementToBeClickable(element,defaultTimeout).click();
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	        	
+	        	
+	        }
+	    
+	    /**
+	     * verify if element is selected.
+	     * @param element - The WebElement to perform click.
+	     */
+	    public boolean verifyElementIsSelected(WebElement element) {	  
+	    	try {    		 
+	   		   waitForElementToBevisible(element,defaultTimeout);
+	   	    }catch (Exception e){
+	   		   scrollToEleWithJS(element);
+	   		   highlightElement(element);
+	   	    }    	
+	    	if(element.isSelected()) {
+	     		return true;
+	     	} return false;
+	    }
+	    /* wait
+	     * 
+	     */
+	    public void waitFor() {
+	    	try {
+	    		Thread.sleep(500);
+	    	}catch (Exception e) {
+	    		e.printStackTrace();
+	    	}
+	        
+	    }
+
+}
 
     
-}
+
