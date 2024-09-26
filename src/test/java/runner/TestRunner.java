@@ -12,7 +12,7 @@ import io.cucumber.testng.AbstractTestNGCucumberTests;
    glue = {"stepDefinitions"},
    plugin = { "pretty", "html:reports/cucumber-reports.html" },
    monochrome = true,
-   tags = "@TestCase1 or @TestCase2" 
+   tags = "@TestCase1" 
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
 

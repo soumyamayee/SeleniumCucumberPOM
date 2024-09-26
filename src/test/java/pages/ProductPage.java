@@ -3,6 +3,8 @@ package pages;
 import static org.junit.Assert.assertFalse;
 
 import java.util.List;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,12 +41,9 @@ public class ProductPage extends BasePage {
     @FindBy(xpath = "//span[text()='In Stock']")
     WebElement inStockFilter;
 
-    @FindBy(xpath = "//span[text()='Sort by:']")
+    @FindBy(xpath = "//span[text()='Sort by:']//ancestor::span[@class='a-button-inner']//i")
     WebElement sortByDropdown;
-    
-    @FindBy(xpath = "//span[text()='Samsung']")
-    WebElement brandFilter;
-    
+        
     @FindBy(xpath ="//span[text()='Electronics & Photo']")
     WebElement electronicsAndPhotoCategory;
     
@@ -66,7 +65,7 @@ public class ProductPage extends BasePage {
     @FindBy(xpath ="//span[@class='a-button-text a-declarative']")
     WebElement sortByButton;
     
-    @FindBy(xpath ="//div[@aria-hidden='false']//a[text()='Price: High to low']")
+    @FindBy(xpath ="//a[text()='Price: High to low']")
     WebElement optionHighToLowPrice;
   
     @FindBy(xpath ="//div[contains(@class,'template=SEARCH_RESULTS')]//span[@class='a-offscreen']")
@@ -75,8 +74,11 @@ public class ProductPage extends BasePage {
     @FindBy(xpath ="(//div[contains(@class,'template=SEARCH_RESULTS')]//span[@class='a-offscreen'])[1]")
     WebElement firstProduct;
     
-    @FindBy(xpath =" //span[@class='a-dropdown-label']//following-sibling::span")
+    @FindBy(xpath ="//span[@class='a-dropdown-prompt']")
     WebElement SelectedSortByOption;
+    
+    @FindBy(xpath ="//span[text()='Samsung']/preceding-sibling ::div//input")
+    WebElement brandFilter;
  
     
     /**
@@ -96,8 +98,7 @@ public class ProductPage extends BasePage {
     public void searchForProduct(String productName) {
     	highlightElement(searchBox);
         searchBox.sendKeys(productName);
-        highlightElement(searchButton);
-        searchButton.click();
+        click(searchButton);
     }
     
     /**
@@ -105,21 +106,27 @@ public class ProductPage extends BasePage {
      * This method clicks the camera resolution filter from the filter options.
      */
     public boolean applyCameraFilter() {
-    	
-    	highlightElement(cameraFilter);    	
-    	 cameraFilter.click(); 
-    	 try {    		 
-    		 waitForElementToBevisible(cameraFilterCheck,defaultTimeout);
-    	 }catch (Exception e){
-    		 scrollToEleWithJS(cameraFilterCheck);
-    		 highlightElement(cameraFilterCheck);
-    	 }
-    	if(cameraFilterCheck.isSelected()) {
-    		return true;
-    	}
-		return false;
+    	click(cameraFilter);
+    	return verifyElementIsSelected(cameraFilterCheck);
     }
-    
+    /**
+     * Applies a filter by camera resolution on the product search results page.
+     * This method clicks the camera resolution filter from the filter options.
+     */
+    public void applyBrandFilter(String brandName) {
+    	try {
+            Thread.sleep(1000);  
+            doubleClickElement(brandFilter);
+            
+            } catch (Exception e) {
+                // Handle click interception with JavaScript click if normal click fails
+           	 scrollToEleWithJS(brandFilter);
+           	 clickElementWithJS(brandFilter);
+           	 
+            }
+    	
+    	}
+    	
     /**
      * Applies and verify a filter by model year on the product search results page.
      * This method clicks the model year filter option.
@@ -127,25 +134,14 @@ public class ProductPage extends BasePage {
     public boolean applyModelYearFilter() {
     	try {
             // Attempt to click the element
-   		 waitForElementToBeClickable(modelYearFilter,defaultTimeout).click();
-            //wait.until(ExpectedConditions.elementToBeClickable(modelYearFilter)).click();
+    		click(modelYearFilter);
         } catch (Exception e) {
             // Handle click interception with JavaScript click if normal click fails
        	 scrollToEleWithJS(modelYearFilter);
        	 clickElementWithJS(modelYearFilter);
        	 
-        }    	
-    	
-    	//verify the filter selected
-    	try {    		 
-   		   waitForElementToBevisible(ModelYearFilterCheck,defaultTimeout);
-   	    }catch (Exception e){
-   		   scrollToEleWithJS(ModelYearFilterCheck);
-   		   highlightElement(ModelYearFilterCheck);
-   	    }    	
-    	if(ModelYearFilterCheck.isSelected()) {
-     		return true;
-     	} return false;
+        }
+    	return verifyElementIsSelected(ModelYearFilterCheck);
     }
     
     /**
@@ -154,15 +150,16 @@ public class ProductPage extends BasePage {
      */
     public void verifyProductSearchResult() throws InterruptedException {
 	    Thread.sleep(1000);
-	   // assertFalse("No products found", productTitles.isEmpty());
+	    assertFalse("No products found", productTitles.isEmpty());
 	    //verify product titles
 	    for (WebElement ele : productTitles) {
-	        String productTitle = ele.getText();	       
-	        System.out.print(productTitle +",");
+	        String productTitle = ele.getText();	        
+	       
+	        System.out.println(productTitle +",");
 	        if(!productTitle.contains("Samsung")) {
 	        	softAssert.assertEquals("Product does not contain 'Samsung'",productTitle.contains("Samsung"));  
 	        }
-	    }
+	    } System.out.println("The total number of phones listed "+ productTitles.size());
     }
     
     /**
@@ -186,9 +183,70 @@ public class ProductPage extends BasePage {
             throw new RuntimeException("Failed to apply price filter", e);
         }
         
+    } 
+    
+    
+    /**
+     * Applies a low price range filter to the search results.
+     * @param lowPriceRange - The price range to filter by (e.g., "£120 - £150").
+     * This method selects the price range filter for the product listings.
+     */
+    public boolean sortByPrice(String sortOption) throws InterruptedException {
+    	clickElement(sortByDropdown);
+        if(sortOption.equalsIgnoreCase("high to low")) {
+        	waitFor();
+        	doubleClickElement(optionHighToLowPrice);
+        	}else {
+        	//sortByPriceLowToHigh.click();
+        }
+        waitFor();
+        //important 
+        String textOptionSelected=SelectedSortByOption.getAttribute("textContent");
+        System.out.println("Product is sorted with : " + textOptionSelected);
+       if(textOptionSelected.contains(sortOption)) {
+    	   return true;
+       }else {
+       return false;}
+    }
+    
+    public boolean verifyFirstPhonePrice(String price) {
+    	//get price of first phone
+    	price = price.replaceAll("[^0-9]", "");
+    	int expectedPrice= Integer.parseInt(price);
+    	System.out.println("expected price is : " + expectedPrice);
+    	verifyElementIsSelected(SelectedSortByOption); 
+    	verifyElementIsSelected(firstProduct);
+    	
+         String text = getInnerTextWithJS(firstProduct);
+         text= text.replace("£", "").replace(",", "");
+         float priceFloat = Float.parseFloat(text);
+         int actualProductPrice = (int) priceFloat;
+    	System.out.println("First product price is : " + text);    	
+    	System.out.println("highPriceProduct is : " + actualProductPrice);
+    	
+    	if(actualProductPrice <= expectedPrice){
+    		return true;
+    	}else{
+    		return false;
+    	}
     }
 
     
+    public void selectProductCatagory() {
+    	try {
+    	click(electronicsAndPhotoCategory);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+    
+   
+    /**
+     * Applies a low price range filter to the search results.
+     * @param lowPriceRange - The price range to filter by (e.g., "£120 - £150").
+     * This method selects the price range filter for the product listings.
+     */
     public void setLowerSliderToTargetValue(int targetVal) throws InterruptedException { 
     	
         try {
@@ -209,7 +267,7 @@ public class ProductPage extends BasePage {
 	
 	            // Validate that the target value is within the slider range
 	            if (targetValue.compareTo(lowerValue) <= 0 || targetValue.compareTo(upperValue) > 0) {
-	                throw new IllegalArgumentException("Target value must be greater than lower slider value and less than or equal to the upper slider value.");
+	                throw new Exception("Target value must be greater than lower slider value and less than or equal to the upper slider value.");
 	            }
 	
 	            // Initialize JavaScriptExecutor
@@ -277,7 +335,11 @@ public class ProductPage extends BasePage {
 	        }
     }
     
- 
+    /**
+     * Applies a high price range filter to the search results.
+     * @param highPriceRange - The price range to filter by (e.g., "£120 - £150").
+     * This method selects the price range filter for the product listings.
+     */
     public void setUpperSliderToTargetValue(int targetVal) throws InterruptedException { 
         try {
             // Wait for sliders to be visible
@@ -373,78 +435,6 @@ public class ProductPage extends BasePage {
         String numericString = ariaValueText.replaceAll("[^0-9]", "");
         return new BigDecimal(numericString);
     }
-    
-    
-    public void applyInStockFilter() {
-        inStockFilter.click();
-    }
-
-    public boolean sortByPrice(String sortOption) throws InterruptedException {
-    	waitForElementToBeClickable(sortByDropdown,defaultTimeout).click();
-        //sortByDropdown.click();
-        if(sortOption.equalsIgnoreCase("high to low")) {
-        	//Thread.sleep(500);
-        	//waitForElementToBeClickable(optionHighToLowPrice,defaultTimeout).click();
-        	clickElementWithJS(optionHighToLowPrice);
-        	//Thread.sleep(500);
-        	}else {
-        	//sortByPriceLowToHigh.click();
-        }
-        waitForElementToBeClickable(SelectedSortByOption,defaultTimeout);
-        String textOptionSelected=SelectedSortByOption.getText();
-        System.out.println("sort product value : " + textOptionSelected);
-       if(textOptionSelected.contains(sortOption)) {
-    	   return true;
-       }else {
-       return false;}
-    }
-    
-    public boolean verifyFirstPhonePrice(String price) {
-    	//get price of first phone
-    	price = price.replaceAll("[^0-9]", "");
-    	int expectedPrice= Integer.parseInt(price);
-    	System.out.println("expected price is : " + expectedPrice);
-    	//scrollToEleWithJS(firstProduct);
-    	//verify the filter selected
-    	try {    		 
-   		   waitForElementToBevisible(SelectedSortByOption,defaultTimeout);
-   	    }catch (Exception e){
-   		   scrollToEleWithJS(SelectedSortByOption);
-   		   highlightElement(SelectedSortByOption);
-   	    }
-    	try {    		 
-    		   waitForElementToBevisible(firstProduct,defaultTimeout);
-	    }catch (Exception e){
-		   scrollToEleWithJS(firstProduct);
-		   highlightElement(firstProduct);
-	    }
-    	 JavascriptExecutor js = (JavascriptExecutor) driver;
-         String text = (String) js.executeScript("return arguments[0].innerText;", firstProduct);
-         text= text.replace("£", "").replace(",", "");
-         float priceFloat = Float.parseFloat(text);
-         int highPriceProduct = (int) priceFloat;
-    	System.out.println("First product price is : " + text);    	
-    	System.out.println("highPriceProduct is : " + highPriceProduct);
-    	if(highPriceProduct < expectedPrice)
-    	{
-    		return true;
-    	}
-    	else
-    	{
-    		return false;
-    	}
-    }
-
-    public void applyBrandFilter() {
-        brandFilter.click();
-    }
-    
-    public void selectProductCatagory() {
-    	electronicsAndPhotoCategory.click();
-    }
-    
-   
-	
     //working with step increment = 1
 //  public void setSliderToTargetValue(int targetVal) throws InterruptedException { 
 //      try {
